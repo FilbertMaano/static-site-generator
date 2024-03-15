@@ -17,9 +17,4 @@ class HTMLNode:
         return s
 
     def __repr__(self) -> str:
-        print("---HTML Node---")
-        print(f"tag: {self.tag}")
-        print(f"value: {self.value}")
-        print(f"children: {self.children}")
-        print(f"props: {self.props}")
-        print("---END---")
+        return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
