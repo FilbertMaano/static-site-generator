@@ -1,25 +1,5 @@
-from textnode import TextNode
-from htmlnode import *
+from textnode import *
 
-print(TextNode("This is a text node", "bold", "https://www.boot.dev"))
-
-node = ParentNode(
-    "p",
-    [
-        LeafNode("b", "Bold text"),
-        LeafNode(None, "Normal text"),
-        LeafNode("i", "italic text"),
-        ParentNode(
-            "p",
-            [
-                LeafNode("b", "Bold text"),
-                LeafNode(None, "Normal text"),
-                LeafNode("i", "italic text"),
-                LeafNode(None, "Normal text"),
-            ],
-        ),
-        LeafNode(None, "Normal text"),
-    ],
-)
-
-print(node.to_html())
+text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+nodes = text_to_textnodes(text)
+print(nodes)
