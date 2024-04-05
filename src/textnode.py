@@ -1,5 +1,5 @@
 import re
-from htmlnode import LeafNode
+from htmlnode import LeafNode, ParentNode
 
 text_type_text = "text"
 text_type_bold = "bold"
@@ -52,7 +52,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if old_node.text.count(delimiter) % 2 != 0:
             raise Exception(f"Closing delimeter for {delimiter} is not found.")
         nodes = old_node.text.split(delimiter)
-        text = old_node.text
+        text = old_node.text.strip()
         for node in nodes:
             if f"{delimiter}{node}{delimiter}" in text:
                 new_nodes.append(TextNode(node, text_type))
@@ -68,7 +68,7 @@ def extract_markdown_images(text):
 
 
 def extract_markdown_links(text):
-    return re.findall(r" \[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
 
 
 def split_nodes_image(old_nodes):
@@ -78,11 +78,12 @@ def split_nodes_image(old_nodes):
         if len(images_tup) == 0:
             new_nodes.append(old_node)
             continue
-        text = old_node.text
+        text = old_node.text.strip()
         for i, image_tup in enumerate(images_tup):
             alt, link = image_tup
             texts = text.split(f"![{alt}]({link})", 1)
-            new_nodes.append(TextNode(texts[0], text_type_text))
+            if texts[0] != "":
+                new_nodes.append(TextNode(texts[0], text_type_text))
             new_nodes.append(TextNode(alt, text_type_image, link))
             text = texts[-1]
         if text != "":
@@ -98,16 +99,16 @@ def split_nodes_link(old_nodes):
         if len(links_tup) == 0:
             new_nodes.append(old_node)
             continue
-        text = old_node.text
+        text = old_node.text.strip()
         for i, link_tup in enumerate(links_tup):
             alt, link = link_tup
             texts = text.split(f"[{alt}]({link})", 1)
-            new_nodes.append(TextNode(texts[0], text_type_text))
+            if texts[0] != "":
+                new_nodes.append(TextNode(texts[0], text_type_text))
             new_nodes.append(TextNode(alt, text_type_link, link))
             text = texts[-1]
         if text != "":
             new_nodes.append(TextNode(text, text_type_text))
-
     return new_nodes
 
 
@@ -116,6 +117,6 @@ def text_to_textnodes(text):
     textnodes = split_nodes_delimiter(textnodes, "**", text_type_bold)
     textnodes = split_nodes_delimiter(textnodes, "*", text_type_italic)
     textnodes = split_nodes_delimiter(textnodes, "`", text_type_code)
-    textnodes = split_nodes_link(textnodes)
     textnodes = split_nodes_image(textnodes)
+    textnodes = split_nodes_link(textnodes)
     return textnodes
